@@ -62,25 +62,31 @@
     viewBox="0 0 1440 320"
     preserveAspectRatio="none"
   >
+    <!-- Far hill (depth layer — ridge above back hill so it peeks into the sky) -->
+    <path
+      d="M0,230 C200,210 380,185 560,178 C740,172 920,180 1100,190 C1270,200 1390,212 1440,218 L1440,320 L0,320 Z"
+      fill="var(--hill-back)"
+      opacity="0.5"
+    />
     <!-- Back hill -->
     <path
       d="M0,280 C120,248 240,210 380,225 C520,240 620,185 780,195 C940,205 1040,245 1180,218 C1320,190 1390,228 1440,235 L1440,320 L0,320 Z"
       fill="var(--hill-back)"
     />
     <!-- Tree silhouettes on back hill (eucaliptos pampeanos) -->
-    <g fill="var(--hill-back)" opacity="0.7">
-      <!-- left tree cluster -->
-      <rect x="88" y="210" width="3" height="30" />
-      <ellipse cx="89.5" cy="205" rx="10" ry="18" />
-      <rect x="108" y="216" width="2.5" height="24" />
-      <ellipse cx="109" cy="212" rx="8" ry="14" />
-      <!-- center-right cluster -->
-      <rect x="960" y="200" width="3" height="32" />
-      <ellipse cx="961.5" cy="195" rx="11" ry="20" />
-      <rect x="980" y="206" width="2.5" height="26" />
-      <ellipse cx="981" cy="202" rx="8" ry="15" />
-      <rect x="995" y="212" width="2" height="20" />
-      <ellipse cx="996" cy="209" rx="7" ry="12" />
+    <g fill="var(--hill-back)">
+      <!-- left cluster — bases aligned to hill surface (y≈256 at x=88, y≈251 at x=108) -->
+      <rect x="86" y="226" width="5" height="30" />
+      <ellipse cx="88.5" cy="220" rx="14" ry="20" />
+      <rect x="107" y="227" width="4" height="24" />
+      <ellipse cx="109" cy="222" rx="11" ry="16" />
+      <!-- center-right cluster — bases aligned to hill surface (y≈217-221 at x=960-995) -->
+      <rect x="958" y="185" width="5" height="32" />
+      <ellipse cx="960.5" cy="178" rx="14" ry="20" />
+      <rect x="978" y="194" width="4" height="26" />
+      <ellipse cx="980" cy="188" rx="10" ry="16" />
+      <rect x="993" y="201" width="3.5" height="20" />
+      <ellipse cx="994.5" cy="197" rx="8" ry="13" />
     </g>
     <!-- Front hill -->
     <path
@@ -302,9 +308,12 @@
   #hills {
     position: absolute;
     bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 40%;
+    left: 50%;
+    transform: translateX(-50%);
+    /* width always covers 100vw; on narrow/tall viewports it's wider (crops sides).
+       height auto-derives from the SVG intrinsic 1440:320 ratio — no deformation. */
+    width: max(100vw, calc(40vh * 4.5));
+    height: auto;
     transition:
       --hill-back 90s ease,
       --hill-front 90s ease;
