@@ -1,286 +1,354 @@
 <!-- Glassmorphism radio player card, centered on screen -->
-<div id="player-card" data-reveal="scale">
+<div id='player-card' data-reveal='scale'>
+   <!-- Station name -->
+   <div class='station-name'>Radio IA <span class='star'>✦</span></div>
 
-  <!-- Station name -->
-  <div class="station-name">Radio IA <span class="star">✦</span></div>
+   <!-- On Air indicator -->
+   <div class='on-air' id='on-air-indicator'>
+      <span class='on-air-dot'></span>
+      <span class='on-air-label'>EN VIVO</span>
+   </div>
 
-  <!-- On Air indicator -->
-  <div class="on-air" id="on-air-indicator">
-    <span class="on-air-dot"></span>
-    <span class="on-air-label">EN VIVO</span>
-  </div>
+   <!-- Waveform visualizer (shown while playing) -->
+   <div class='waveform' id='waveform' aria-hidden='true'>
+      <span class='bar'></span>
+      <span class='bar'></span>
+      <span class='bar'></span>
+      <span class='bar'></span>
+      <span class='bar'></span>
+      <span class='bar'></span>
+      <span class='bar'></span>
+      <span class='bar'></span>
+      <span class='bar'></span>
+   </div>
 
-  <!-- Waveform visualizer (shown while playing) -->
-  <div class="waveform" id="waveform" aria-hidden="true">
-    <span class="bar"></span>
-    <span class="bar"></span>
-    <span class="bar"></span>
-    <span class="bar"></span>
-    <span class="bar"></span>
-    <span class="bar"></span>
-    <span class="bar"></span>
-    <span class="bar"></span>
-    <span class="bar"></span>
-  </div>
+   <!-- Play / Pause button -->
+   <button
+      id='play-btn'
+      class='play-btn'
+      aria-label='Reproducir radio'
+      title='Reproducir'
+   >
+      <!-- Play icon -->
+      <svg id='icon-play' class='btn-icon' viewBox='0 0 24 24' fill='none'>
+         <polygon points='5,3 19,12 5,21' fill='currentColor'></polygon>
+      </svg>
+      <!-- Pause icon (hidden by default) -->
+      <svg
+         id='icon-pause'
+         class='btn-icon hidden'
+         viewBox='0 0 24 24'
+         fill='none'
+      >
+         <rect x='4' y='3' width='5' height='18' rx='1.5' fill='currentColor'
+         ></rect>
+         <rect x='15' y='3' width='5' height='18' rx='1.5' fill='currentColor'
+         ></rect>
+      </svg>
+      <!-- Loading spinner (hidden by default) -->
+      <svg
+         id='icon-loading'
+         class='btn-icon hidden spin'
+         viewBox='0 0 24 24'
+         fill='none'
+      >
+         <circle
+            cx='12'
+            cy='12'
+            r='9'
+            stroke='currentColor'
+            stroke-width='2'
+            stroke-dasharray='28 6'></circle>
+      </svg>
+   </button>
 
-  <!-- Play / Pause button -->
-  <button
-    id="play-btn"
-    class="play-btn"
-    aria-label="Reproducir radio"
-    title="Reproducir"
-  >
-    <!-- Play icon -->
-    <svg id="icon-play" class="btn-icon" viewBox="0 0 24 24" fill="none">
-      <polygon points="5,3 19,12 5,21" fill="currentColor" />
-    </svg>
-    <!-- Pause icon (hidden by default) -->
-    <svg id="icon-pause" class="btn-icon hidden" viewBox="0 0 24 24" fill="none">
-      <rect x="4" y="3" width="5" height="18" rx="1.5" fill="currentColor" />
-      <rect x="15" y="3" width="5" height="18" rx="1.5" fill="currentColor" />
-    </svg>
-    <!-- Loading spinner (hidden by default) -->
-    <svg id="icon-loading" class="btn-icon hidden spin" viewBox="0 0 24 24" fill="none">
-      <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2" stroke-dasharray="28 6" />
-    </svg>
-  </button>
+   <!-- Volume control -->
+   <div class='volume-row'>
+      <svg class='vol-icon' viewBox='0 0 24 24' fill='none'>
+         <path d='M3 9v6h4l5 5V4L7 9H3z' fill='currentColor' opacity='0.7'
+         ></path>
+         <path
+            d='M16.5 12A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12z'
+            fill='currentColor'
+            opacity='0.5'></path>
+      </svg>
+      <input
+         id='volume-slider'
+         type='range'
+         min='0'
+         max='1'
+         step='0.01'
+         value='0.8'
+         aria-label='Volumen'
+      />
+      <svg class='vol-icon' viewBox='0 0 24 24' fill='none'>
+         <path d='M3 9v6h4l5 5V4L7 9H3z' fill='currentColor' opacity='0.7'
+         ></path>
+         <path
+            d='M16.5 12A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12z'
+            fill='currentColor'
+            opacity='0.7'></path>
+         <path
+            d='M19 12A7 7 0 0 0 14 5.64v12.73A7 7 0 0 0 19 12z'
+            fill='currentColor'
+            opacity='0.4'></path>
+      </svg>
+   </div>
 
-  <!-- Volume control -->
-  <div class="volume-row">
-    <svg class="vol-icon" viewBox="0 0 24 24" fill="none">
-      <path d="M3 9v6h4l5 5V4L7 9H3z" fill="currentColor" opacity="0.7"/>
-      <path d="M16.5 12A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12z" fill="currentColor" opacity="0.5"/>
-    </svg>
-    <input
-      id="volume-slider"
-      type="range"
-      min="0"
-      max="1"
-      step="0.01"
-      value="0.8"
-      aria-label="Volumen"
-    />
-    <svg class="vol-icon" viewBox="0 0 24 24" fill="none">
-      <path d="M3 9v6h4l5 5V4L7 9H3z" fill="currentColor" opacity="0.7"/>
-      <path d="M16.5 12A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12z" fill="currentColor" opacity="0.7"/>
-      <path d="M19 12A7 7 0 0 0 14 5.64v12.73A7 7 0 0 0 19 12z" fill="currentColor" opacity="0.4"/>
-    </svg>
-  </div>
-
-  <!-- Hidden audio element -->
-  <audio id="radio-audio" preload="none" crossorigin="anonymous">
-    <source src="http://193.203.174.95:8000/radio.mp3" type="audio/mpeg" />
-  </audio>
-
+   <!-- Hidden audio element -->
+   <audio id='radio-audio' preload='none' crossorigin='anonymous'>
+      <source src='https://radio.nicopicotto.dev/radio.mp3' type='audio/mpeg' />
+   </audio>
 </div>
 
 <style>
-  #player-card {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 10;
+   #player-card {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 10;
 
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.25rem;
 
-    padding: 2rem 2.5rem 1.75rem;
-    min-width: 280px;
+      padding: 2rem 2.5rem 1.75rem;
+      min-width: 280px;
 
-    background: rgba(255, 255, 255, 0.07);
-    backdrop-filter: blur(28px) saturate(1.4);
-    -webkit-backdrop-filter: blur(28px) saturate(1.4);
-    border: 1px solid rgba(255, 255, 255, 0.13);
-    border-radius: 28px;
-    box-shadow:
-      0 8px 32px rgba(0, 0, 0, 0.35),
-      0 1px 0 rgba(255, 255, 255, 0.1) inset;
+      background: rgba(255, 255, 255, 0.07);
+      backdrop-filter: blur(28px) saturate(1.4);
+      -webkit-backdrop-filter: blur(28px) saturate(1.4);
+      border: 1px solid rgba(255, 255, 255, 0.13);
+      border-radius: 28px;
+      box-shadow:
+         0 8px 32px rgba(0, 0, 0, 0.35),
+         0 1px 0 rgba(255, 255, 255, 0.1) inset;
 
-    color: rgba(255, 255, 255, 0.92);
-  }
+      color: rgba(255, 255, 255, 0.92);
+   }
 
-  /* === STATION NAME === */
-  .station-name {
-    font-size: 1.05rem;
-    font-weight: 300;
-    letter-spacing: 0.28em;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.85);
-  }
+   /* === STATION NAME === */
+   .station-name {
+      font-size: 1.05rem;
+      font-weight: 300;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.85);
+   }
 
-  .star {
-    font-size: 0.7em;
-    opacity: 0.6;
-    vertical-align: middle;
-  }
+   .star {
+      font-size: 0.7em;
+      opacity: 0.6;
+      vertical-align: middle;
+   }
 
-  /* === ON AIR === */
-  .on-air {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    opacity: 0.5;
-    transition: opacity 0.5s ease;
-  }
+   /* === ON AIR === */
+   .on-air {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      opacity: 0.5;
+      transition: opacity 0.5s ease;
+   }
 
-  .on-air.live {
-    opacity: 1;
-  }
+   .on-air.live {
+      opacity: 1;
+   }
 
-  .on-air-dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: #4caf80;
-  }
+   .on-air-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #4caf80;
+   }
 
-  .on-air.live .on-air-dot {
-    animation: pulse-dot 1.8s ease-in-out infinite;
-    box-shadow: 0 0 6px #4caf80;
-  }
+   .on-air.live .on-air-dot {
+      animation: pulse-dot 1.8s ease-in-out infinite;
+      box-shadow: 0 0 6px #4caf80;
+   }
 
-  @keyframes pulse-dot {
-    0%, 100% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.4); opacity: 0.7; }
-  }
+   @keyframes pulse-dot {
+      0%,
+      100% {
+         transform: scale(1);
+         opacity: 1;
+      }
+      50% {
+         transform: scale(1.4);
+         opacity: 0.7;
+      }
+   }
 
-  .on-air-label {
-    font-size: 0.62rem;
-    font-weight: 500;
-    letter-spacing: 0.2em;
-    color: rgba(255, 255, 255, 0.7);
-  }
+   .on-air-label {
+      font-size: 0.62rem;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      color: rgba(255, 255, 255, 0.7);
+   }
 
-  /* === WAVEFORM === */
-  .waveform {
-    display: flex;
-    align-items: center;
-    gap: 3px;
-    height: 28px;
-    opacity: 0;
-    transition: opacity 0.5s ease;
-  }
+   /* === WAVEFORM === */
+   .waveform {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      height: 28px;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+   }
 
-  .waveform.playing {
-    opacity: 1;
-  }
+   .waveform.playing {
+      opacity: 1;
+   }
 
-  .bar {
-    display: block;
-    width: 3px;
-    border-radius: 2px;
-    background: rgba(255, 255, 255, 0.55);
-    animation: wave 1.2s ease-in-out infinite;
-    transform-origin: bottom;
-  }
+   .bar {
+      display: block;
+      width: 3px;
+      border-radius: 2px;
+      background: rgba(255, 255, 255, 0.55);
+      animation: wave 1.2s ease-in-out infinite;
+      transform-origin: bottom;
+   }
 
-  .bar:nth-child(1)  { height: 8px;  animation-delay: 0s; }
-  .bar:nth-child(2)  { height: 18px; animation-delay: 0.1s; }
-  .bar:nth-child(3)  { height: 12px; animation-delay: 0.2s; }
-  .bar:nth-child(4)  { height: 22px; animation-delay: 0.15s; }
-  .bar:nth-child(5)  { height: 28px; animation-delay: 0.05s; }
-  .bar:nth-child(6)  { height: 20px; animation-delay: 0.3s; }
-  .bar:nth-child(7)  { height: 14px; animation-delay: 0.1s; }
-  .bar:nth-child(8)  { height: 18px; animation-delay: 0.25s; }
-  .bar:nth-child(9)  { height: 9px;  animation-delay: 0s; }
+   .bar:nth-child(1) {
+      height: 8px;
+      animation-delay: 0s;
+   }
+   .bar:nth-child(2) {
+      height: 18px;
+      animation-delay: 0.1s;
+   }
+   .bar:nth-child(3) {
+      height: 12px;
+      animation-delay: 0.2s;
+   }
+   .bar:nth-child(4) {
+      height: 22px;
+      animation-delay: 0.15s;
+   }
+   .bar:nth-child(5) {
+      height: 28px;
+      animation-delay: 0.05s;
+   }
+   .bar:nth-child(6) {
+      height: 20px;
+      animation-delay: 0.3s;
+   }
+   .bar:nth-child(7) {
+      height: 14px;
+      animation-delay: 0.1s;
+   }
+   .bar:nth-child(8) {
+      height: 18px;
+      animation-delay: 0.25s;
+   }
+   .bar:nth-child(9) {
+      height: 9px;
+      animation-delay: 0s;
+   }
 
-  @keyframes wave {
-    0%, 100% { transform: scaleY(0.5); }
-    50% { transform: scaleY(1); }
-  }
+   @keyframes wave {
+      0%,
+      100% {
+         transform: scaleY(0.5);
+      }
+      50% {
+         transform: scaleY(1);
+      }
+   }
 
-  /* === PLAY BUTTON === */
-  .play-btn {
-    width: 72px;
-    height: 72px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.12);
-    border: 1.5px solid rgba(255, 255, 255, 0.22);
-    color: rgba(255, 255, 255, 0.9);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition:
-      background 0.25s ease,
-      transform 0.15s ease,
-      box-shadow 0.25s ease;
-  }
+   /* === PLAY BUTTON === */
+   .play-btn {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1.5px solid rgba(255, 255, 255, 0.22);
+      color: rgba(255, 255, 255, 0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition:
+         background 0.25s ease,
+         transform 0.15s ease,
+         box-shadow 0.25s ease;
+   }
 
-  .play-btn:hover {
-    background: rgba(255, 255, 255, 0.2);
-    transform: scale(1.06);
-    box-shadow: 0 0 24px rgba(255, 255, 255, 0.15);
-  }
+   .play-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: scale(1.06);
+      box-shadow: 0 0 24px rgba(255, 255, 255, 0.15);
+   }
 
-  .play-btn:active {
-    transform: scale(0.96);
-  }
+   .play-btn:active {
+      transform: scale(0.96);
+   }
 
-  .btn-icon {
-    width: 28px;
-    height: 28px;
-  }
+   .btn-icon {
+      width: 28px;
+      height: 28px;
+   }
 
-  .hidden {
-    display: none;
-  }
+   .hidden {
+      display: none;
+   }
 
-  .spin {
-    animation: spin-anim 1s linear infinite;
-  }
+   .spin {
+      animation: spin-anim 1s linear infinite;
+   }
 
-  @keyframes spin-anim {
-    to { transform: rotate(360deg); }
-  }
+   @keyframes spin-anim {
+      to {
+         transform: rotate(360deg);
+      }
+   }
 
-  /* === VOLUME === */
-  .volume-row {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    width: 100%;
-  }
+   /* === VOLUME === */
+   .volume-row {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      width: 100%;
+   }
 
-  .vol-icon {
-    width: 16px;
-    height: 16px;
-    flex-shrink: 0;
-    color: rgba(255, 255, 255, 0.5);
-  }
+   .vol-icon {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+      color: rgba(255, 255, 255, 0.5);
+   }
 
-  #volume-slider {
-    flex: 1;
-    height: 3px;
-    border-radius: 2px;
-    background: rgba(255, 255, 255, 0.15);
-    outline: none;
-    cursor: pointer;
-  }
+   #volume-slider {
+      flex: 1;
+      height: 3px;
+      border-radius: 2px;
+      background: rgba(255, 255, 255, 0.15);
+      outline: none;
+      cursor: pointer;
+   }
 
-  #volume-slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.85);
-    cursor: pointer;
-    box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
-    transition: transform 0.15s ease;
-  }
+   #volume-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.85);
+      cursor: pointer;
+      box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
+      transition: transform 0.15s ease;
+   }
 
-  #volume-slider::-webkit-slider-thumb:hover {
-    transform: scale(1.2);
-  }
+   #volume-slider::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+   }
 
-  #volume-slider::-moz-range-thumb {
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.85);
-    border: none;
-    cursor: pointer;
-  }
+   #volume-slider::-moz-range-thumb {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.85);
+      border: none;
+      cursor: pointer;
+   }
 </style>
