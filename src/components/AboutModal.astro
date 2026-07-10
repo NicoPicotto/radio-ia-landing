@@ -1,0 +1,218 @@
+<!-- About the project modal -->
+<div id="about-modal" aria-modal="true" role="dialog" aria-labelledby="modal-title">
+
+  <!-- Backdrop -->
+  <div id="modal-backdrop"></div>
+
+  <!-- Card -->
+  <div id="modal-card">
+
+    <!-- Close button -->
+    <button id="modal-close" aria-label="Cerrar">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+    </button>
+
+    <!-- Content -->
+    <div class="modal-header">
+      <span class="modal-icon">📡</span>
+      <h2 id="modal-title">Sobre el proyecto</h2>
+    </div>
+
+    <div class="modal-body">
+      <p>
+        Una radio generada con inteligencia artificial que transmite las 24 horas,
+        los 7 días de la semana desde las pampas argentinas.
+      </p>
+      <p>
+        Música, ambientes y voces compuestos y sintetizados en tiempo real.
+        Sin repetición, sin descanso.
+      </p>
+
+      <div class="modal-divider"></div>
+
+      <div class="modal-meta">
+        <span class="meta-label">Ubicación</span>
+        <span class="meta-value">General Deheza, Córdoba 🇦🇷</span>
+      </div>
+      <div class="modal-meta">
+        <span class="meta-label">Stream</span>
+        <span class="meta-value">24/7 · MP3</span>
+      </div>
+    </div>
+
+    <!-- Donate link (no functionality yet) -->
+    <a href="#" class="donate-link" onclick="return false;" aria-label="Apoyar el proyecto">
+      <svg viewBox="0 0 24 24" fill="none" width="16" height="16">
+        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="currentColor"/>
+      </svg>
+      Apoyar el proyecto
+    </a>
+
+  </div>
+</div>
+
+<style>
+  #about-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #about-modal.open {
+    display: flex;
+  }
+
+  /* === BACKDROP === */
+  #modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    animation: fade-in 0.25s ease;
+  }
+
+  /* === CARD === */
+  #modal-card {
+    position: relative;
+    z-index: 1;
+    width: 92%;
+    max-width: 420px;
+
+    padding: 2rem;
+    background: rgba(8, 12, 28, 0.88);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    box-shadow:
+      0 24px 60px rgba(0, 0, 0, 0.5),
+      0 1px 0 rgba(255, 255, 255, 0.08) inset;
+
+    color: rgba(255, 255, 255, 0.85);
+    animation: slide-up 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  @keyframes slide-up {
+    from { opacity: 0; transform: translateY(20px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  /* === CLOSE BUTTON === */
+  #modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.45);
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: color 0.2s, background 0.2s;
+    cursor: pointer;
+  }
+
+  #modal-close:hover {
+    color: rgba(255, 255, 255, 0.9);
+    background: rgba(255, 255, 255, 0.12);
+  }
+
+  #modal-close svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  /* === HEADER === */
+  .modal-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .modal-icon {
+    font-size: 1.4rem;
+  }
+
+  #modal-title {
+    font-size: 1.1rem;
+    font-weight: 400;
+    letter-spacing: 0.06em;
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  /* === BODY === */
+  .modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .modal-body p {
+    font-size: 0.88rem;
+    font-weight: 300;
+    line-height: 1.65;
+    color: rgba(255, 255, 255, 0.65);
+  }
+
+  .modal-divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.08);
+    margin: 0.5rem 0;
+  }
+
+  .modal-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.78rem;
+  }
+
+  .meta-label {
+    color: rgba(255, 255, 255, 0.35);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-size: 0.68rem;
+  }
+
+  .meta-value {
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  /* === DONATE LINK === */
+  .donate-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.7rem;
+    border-radius: 12px;
+    background: rgba(255, 80, 80, 0.12);
+    border: 1px solid rgba(255, 80, 80, 0.2);
+    color: rgba(255, 160, 160, 0.8);
+    font-size: 0.82rem;
+    letter-spacing: 0.04em;
+    text-decoration: none;
+    transition: background 0.25s, color 0.25s;
+    cursor: default;
+  }
+
+  .donate-link:hover {
+    background: rgba(255, 80, 80, 0.18);
+    color: rgba(255, 180, 180, 0.95);
+  }
+</style>

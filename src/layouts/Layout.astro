@@ -1,0 +1,87 @@
+---
+interface Props {
+  title?: string;
+  description?: string;
+}
+const {
+  title = 'Radio IA',
+  description = 'Tu radio de inteligencia artificial, 24/7',
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#030612" />
+    <title>{title}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>
+
+<style is:global>
+  /* Animatable CSS custom properties for the sky */
+  @property --sky-top {
+    syntax: '<color>';
+    initial-value: #030612;
+    inherits: false;
+  }
+  @property --sky-mid {
+    syntax: '<color>';
+    initial-value: #0a0f22;
+    inherits: false;
+  }
+  @property --sky-bot {
+    syntax: '<color>';
+    initial-value: #0f1530;
+    inherits: false;
+  }
+  @property --hill-back {
+    syntax: '<color>';
+    initial-value: #040608;
+    inherits: false;
+  }
+  @property --hill-front {
+    syntax: '<color>';
+    initial-value: #020306;
+    inherits: false;
+  }
+
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html,
+  body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #030612;
+  }
+
+  button {
+    cursor: pointer;
+    border: none;
+    background: none;
+    font-family: inherit;
+  }
+
+  input[type='range'] {
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+  }
+</style>

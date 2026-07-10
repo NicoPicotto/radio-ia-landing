@@ -1,0 +1,535 @@
+---
+import Layout from '../layouts/Layout.astro';
+import SkyScene from '../components/SkyScene.astro';
+import RadioPlayer from '../components/RadioPlayer.astro';
+import SideButtons from '../components/SideButtons.astro';
+import AboutModal from '../components/AboutModal.astro';
+---
+
+<Layout title="Radio IA" description="Tu radio de inteligencia artificial, 24/7">
+  <SkyScene />
+  <RadioPlayer />
+  <SideButtons />
+  <AboutModal />
+
+  <!-- Weather & time HUD (bottom-left, above hills) -->
+  <div id="weather-hud" data-reveal="up">
+    <div id="hud-row-top">
+      <span id="hud-icon">·</span>
+      <span id="hud-temp"></span>
+    </div>
+    <span id="hud-time">--:--</span>
+    <span id="hud-city">General Deheza</span>
+  </div>
+</Layout>
+
+<!-- ============================================================
+     SKY ENGINE + PLAYER + MODAL — all JS in one bundled module
+     ============================================================ -->
+<script>
+// ─── UTILITIES ────────────────────────────────────────────────
+function hexToRgb(hex: string): [number, number, number] {
+  return [
+    parseInt(hex.slice(1, 3), 16),
+    parseInt(hex.slice(3, 5), 16),
+    parseInt(hex.slice(5, 7), 16),
+  ];
+}
+
+function rgbToHex(r: number, g: number, b: number): string {
+  return '#' + [r, g, b]
+    .map(v => Math.round(Math.max(0, Math.min(255, v))).toString(16).padStart(2, '0'))
+    .join('');
+}
+
+function lerpColor(a: string, b: string, t: number): string {
+  const [r1, g1, b1] = hexToRgb(a);
+  const [r2, g2, b2] = hexToRgb(b);
+  return rgbToHex(r1 + (r2 - r1) * t, g1 + (g2 - g1) * t, b1 + (b2 - b1) * t);
+}
+
+function lerp(a: number, b: number, t: number): number {
+  return a + (b - a) * t;
+}
+
+function clamp(v: number, lo: number, hi: number): number {
+  return Math.max(lo, Math.min(hi, v));
+}
+
+// ─── TIME (UTC-3, General Deheza, Argentina) ──────────────────
+function getLocalTime() {
+  const now = new Date();
+  const utcMin = now.getUTCHours() * 60 + now.getUTCMinutes();
+  const localMin = ((utcMin - 180) % 1440 + 1440) % 1440;
+  return {
+    hours:   Math.floor(localMin / 60),
+    minutes: localMin % 60,
+    total:   localMin / 60,
+  };
+}
+
+function padTwo(n: number): string {
+  return String(n).padStart(2, '0');
+}
+
+// ─── SKY PHASES ───────────────────────────────────────────────
+interface Phase {
+  h: number;
+  top: string; mid: string; bot: string;
+  hillBack: string; hillFront: string;
+  stars: number;
+}
+
+// 24-hour ambient color palette for General Deheza (Southern hemisphere)
+const PHASES: Phase[] = [
+  { h: 0,  top: '#020510', mid: '#080d1e', bot: '#0c1228', hillBack: '#040710', hillFront: '#020408', stars: 1.0 },
+  { h: 4,  top: '#0a0820', mid: '#180c2e', bot: '#23103a', hillBack: '#0e0816', hillFront: '#070510', stars: 0.85 },
+  { h: 5,  top: '#200e38', mid: '#8c2255', bot: '#d44422', hillBack: '#1a0810', hillFront: '#0e0608', stars: 0.45 },
+  { h: 6,  top: '#e05030', mid: '#f0924a', bot: '#ffd060', hillBack: '#2a1012', hillFront: '#180a0a', stars: 0.05 },
+  { h: 7,  top: '#58b0d8', mid: '#7ecae8', bot: '#d0eaf5', hillBack: '#183018', hillFront: '#0e1e0e', stars: 0.0  },
+  { h: 10, top: '#1a8dd0', mid: '#36aee0', bot: '#96d8f0', hillBack: '#163020', hillFront: '#0c1c0e', stars: 0.0  },
+  { h: 13, top: '#1678c8', mid: '#2890d8', bot: '#7ac8e8', hillBack: '#142e1e', hillFront: '#0c1c0c', stars: 0.0  },
+  { h: 16, top: '#2272c0', mid: '#4a90d0', bot: '#cfa040', hillBack: '#182812', hillFront: '#101808', stars: 0.0  },
+  { h: 18, top: '#c84020', mid: '#a0206c', bot: '#501888', hillBack: '#220a1a', hillFront: '#160812', stars: 0.0  },
+  { h: 19, top: '#8020a0', mid: '#401888', bot: '#1e1060', hillBack: '#180a22', hillFront: '#10061a', stars: 0.2  },
+  { h: 20, top: '#1a1038', mid: '#1c1448', bot: '#2a1865', hillBack: '#0e0a1e', hillFront: '#080616', stars: 0.55 },
+  { h: 21, top: '#0e0a22', mid: '#0e0c20', bot: '#141828', hillBack: '#070614', hillFront: '#04040a', stars: 0.8  },
+  { h: 23, top: '#020510', mid: '#080d1e', bot: '#0c1228', hillBack: '#040710', hillFront: '#020408', stars: 1.0  },
+];
+
+function getPhaseColors(totalHours: number) {
+  // Default wrap-around: between last phase and next-day first phase
+  let before: Phase = PHASES[PHASES.length - 1];
+  let after: Phase  = { ...PHASES[0], h: PHASES[0].h + 24 };
+
+  for (let i = 0; i < PHASES.length - 1; i++) {
+    if (totalHours >= PHASES[i].h && totalHours < PHASES[i + 1].h) {
+      before = PHASES[i];
+      after  = PHASES[i + 1];
+      break;
+    }
+  }
+
+  const t = clamp((totalHours - before.h) / (after.h - before.h), 0, 1);
+
+  return {
+    top:       lerpColor(before.top,       after.top,       t),
+    mid:       lerpColor(before.mid,       after.mid,       t),
+    bot:       lerpColor(before.bot,       after.bot,       t),
+    hillBack:  lerpColor(before.hillBack,  after.hillBack,  t),
+    hillFront: lerpColor(before.hillFront, after.hillFront, t),
+    stars:     lerp(before.stars, after.stars, t),
+  };
+}
+
+// ─── CELESTIAL POSITIONING ────────────────────────────────────
+// Returns { type, x (left%), y (top%), opacity }
+// Sun rises ~6am, sets ~7:30pm; moon is the inverse arc.
+// Hills front peak is ~9% from bottom of viewport → ~91% from top.
+// At horizon: y=90% (sun just resting on hills). At noon: y=8%.
+function getCelestialInfo(totalHours: number) {
+  const SUNRISE = 6.0;
+  const SUNSET  = 19.5;
+  const isDay = totalHours >= SUNRISE && totalHours <= SUNSET;
+
+  if (isDay) {
+    const p = (totalHours - SUNRISE) / (SUNSET - SUNRISE);
+    return {
+      type: 'sun' as const,
+      x: 5 + p * 90,
+      y: 90 - Math.sin(Math.PI * p) * 82,
+      opacity: 1,
+    };
+  }
+
+  // Moon arcs from sunset to next sunrise
+  const MOONRISE = SUNSET;
+  const MOONSET  = SUNRISE + 24;
+  const h = totalHours < SUNRISE ? totalHours + 24 : totalHours;
+  const p = clamp((h - MOONRISE) / (MOONSET - MOONRISE), 0, 1);
+  return {
+    type: 'moon' as const,
+    x: 5 + p * 90,
+    y: 90 - Math.sin(Math.PI * p) * 72,
+    opacity: 0.88,
+  };
+}
+
+// ─── STARS ────────────────────────────────────────────────────
+function drawStars() {
+  const canvas = document.getElementById('stars-canvas') as HTMLCanvasElement | null;
+  if (!canvas) return;
+  canvas.width  = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  const count = Math.floor((canvas.width * canvas.height) / 5500);
+
+  for (let i = 0; i < count; i++) {
+    const x  = Math.random() * canvas.width;
+    const y  = Math.random() * canvas.height * 0.78;
+    const r  = Math.random() * 1.15 + 0.15;
+    const op = Math.random() * 0.65 + 0.3;
+
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(210, 225, 255, ${op})`;
+    ctx.fill();
+
+    // Occasional sparkle cross on brighter stars
+    if (r > 1.0 && Math.random() < 0.08) {
+      ctx.globalAlpha = op * 0.35;
+      ctx.strokeStyle = `rgba(210, 225, 255, 1)`;
+      ctx.lineWidth = 0.5;
+      ctx.beginPath(); ctx.moveTo(x - 5, y); ctx.lineTo(x + 5, y); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(x, y - 5); ctx.lineTo(x, y + 5); ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+  }
+}
+
+// ─── WEATHER PARTICLES (rain / snow) ─────────────────────────
+type WeatherMode = 'none' | 'rain' | 'snow';
+
+interface Particle {
+  x: number; y: number; speed: number; size: number; op: number;
+}
+
+let rafId: number | null = null;
+let activeMode: WeatherMode = 'none';
+let particles: Particle[] = [];
+
+function makeParticles(mode: 'rain' | 'snow', w: number, h: number): Particle[] {
+  const n = mode === 'rain' ? 200 : 130;
+  return Array.from({ length: n }, () => ({
+    x:     Math.random() * w,
+    y:     Math.random() * h,
+    speed: mode === 'rain' ? 9 + Math.random() * 5 : 1.1 + Math.random() * 1.4,
+    size:  mode === 'rain' ? 9 + Math.random() * 5  : 2 + Math.random() * 2,
+    op:    mode === 'rain' ? 0.22 + Math.random() * 0.18 : 0.45 + Math.random() * 0.35,
+  }));
+}
+
+function animateParticles(mode: 'rain' | 'snow') {
+  const canvas = document.getElementById('weather-canvas') as HTMLCanvasElement | null;
+  const ctx = canvas?.getContext('2d');
+  if (!canvas || !ctx) return;
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  for (const p of particles) {
+    if (mode === 'rain') {
+      ctx.beginPath();
+      ctx.moveTo(p.x, p.y);
+      ctx.lineTo(p.x + 1.5, p.y + p.size);
+      ctx.strokeStyle = `rgba(165, 195, 230, ${p.op})`;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      p.y += p.speed;
+      p.x += 0.9;
+    } else {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size / 2, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(235, 242, 255, ${p.op})`;
+      ctx.fill();
+      p.y += p.speed;
+      p.x += Math.sin(Date.now() * 0.001 + p.y * 0.04) * 0.4;
+    }
+
+    if (p.y > canvas.height + 10) { p.y = -10; p.x = Math.random() * canvas.width; }
+    if (p.x > canvas.width + 20)   p.x = -10;
+    if (p.x < -20)                 p.x = canvas.width + 10;
+  }
+
+  rafId = requestAnimationFrame(() => animateParticles(mode));
+}
+
+function setWeatherMode(mode: WeatherMode) {
+  const canvas = document.getElementById('weather-canvas') as HTMLCanvasElement | null;
+  if (!canvas) return;
+
+  if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null; }
+
+  if (mode === 'none') {
+    canvas.classList.remove('active');
+    canvas.getContext('2d')?.clearRect(0, 0, canvas.width, canvas.height);
+  } else {
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+    particles = makeParticles(mode, canvas.width, canvas.height);
+    canvas.classList.add('active');
+    animateParticles(mode);
+  }
+
+  activeMode = mode;
+}
+
+// ─── WEATHER FETCH (wttr.in, no API key) ─────────────────────
+const W_MAP: Record<number, { icon: string; clouds: 0|1|2|3; rain: boolean; snow: boolean; fog: boolean }> = {
+  113: { icon: '☀',  clouds: 0, rain: false, snow: false, fog: false },
+  116: { icon: '⛅', clouds: 1, rain: false, snow: false, fog: false },
+  119: { icon: '☁',  clouds: 2, rain: false, snow: false, fog: false },
+  122: { icon: '☁',  clouds: 3, rain: false, snow: false, fog: false },
+  143: { icon: '🌫', clouds: 2, rain: false, snow: false, fog: true  },
+  176: { icon: '🌦', clouds: 2, rain: true,  snow: false, fog: false },
+  179: { icon: '🌨', clouds: 2, rain: false, snow: true,  fog: false },
+  200: { icon: '⛈', clouds: 3, rain: true,  snow: false, fog: false },
+  227: { icon: '❄',  clouds: 2, rain: false, snow: true,  fog: false },
+  230: { icon: '❄',  clouds: 3, rain: false, snow: true,  fog: false },
+  248: { icon: '🌫', clouds: 2, rain: false, snow: false, fog: true  },
+  260: { icon: '🌫', clouds: 2, rain: false, snow: false, fog: true  },
+  263: { icon: '🌧', clouds: 2, rain: true,  snow: false, fog: false },
+  266: { icon: '🌧', clouds: 2, rain: true,  snow: false, fog: false },
+  293: { icon: '🌧', clouds: 2, rain: true,  snow: false, fog: false },
+  296: { icon: '🌧', clouds: 2, rain: true,  snow: false, fog: false },
+  299: { icon: '🌧', clouds: 3, rain: true,  snow: false, fog: false },
+  302: { icon: '🌧', clouds: 3, rain: true,  snow: false, fog: false },
+  305: { icon: '🌧', clouds: 3, rain: true,  snow: false, fog: false },
+  308: { icon: '🌧', clouds: 3, rain: true,  snow: false, fog: false },
+  317: { icon: '🌨', clouds: 2, rain: false, snow: true,  fog: false },
+  320: { icon: '🌨', clouds: 2, rain: false, snow: true,  fog: false },
+  323: { icon: '🌨', clouds: 2, rain: false, snow: true,  fog: false },
+  326: { icon: '🌨', clouds: 2, rain: false, snow: true,  fog: false },
+  329: { icon: '❄',  clouds: 3, rain: false, snow: true,  fog: false },
+  332: { icon: '❄',  clouds: 3, rain: false, snow: true,  fog: false },
+  335: { icon: '❄',  clouds: 3, rain: false, snow: true,  fog: false },
+  338: { icon: '❄',  clouds: 3, rain: false, snow: true,  fog: false },
+  353: { icon: '🌦', clouds: 1, rain: true,  snow: false, fog: false },
+  356: { icon: '🌧', clouds: 2, rain: true,  snow: false, fog: false },
+  359: { icon: '🌧', clouds: 3, rain: true,  snow: false, fog: false },
+  362: { icon: '🌨', clouds: 2, rain: false, snow: true,  fog: false },
+  365: { icon: '🌨', clouds: 2, rain: false, snow: true,  fog: false },
+  368: { icon: '🌨', clouds: 1, rain: false, snow: true,  fog: false },
+  371: { icon: '❄',  clouds: 3, rain: false, snow: true,  fog: false },
+  386: { icon: '⛈', clouds: 3, rain: true,  snow: false, fog: false },
+  389: { icon: '⛈', clouds: 3, rain: true,  snow: false, fog: false },
+  392: { icon: '⛈', clouds: 3, rain: false, snow: true,  fog: false },
+  395: { icon: '⛈', clouds: 3, rain: false, snow: true,  fog: false },
+};
+
+async function fetchWeather() {
+  try {
+    const res  = await fetch('https://wttr.in/General+Deheza?format=j1');
+    if (!res.ok) return;
+    const data = await res.json();
+    const cond = data.current_condition[0];
+    const code = parseInt(cond.weatherCode, 10);
+    const temp = cond.temp_C;
+
+    const fx = W_MAP[code] ?? { icon: '☀', clouds: 0, rain: false, snow: false, fog: false };
+
+    // Update HUD
+    const hudIcon = document.getElementById('hud-icon');
+    const hudTemp = document.getElementById('hud-temp');
+    if (hudIcon) hudIcon.textContent = fx.icon;
+    if (hudTemp) hudTemp.textContent  = `${temp}°`;
+
+    // Clouds
+    const cloudsEl = document.getElementById('clouds-layer');
+    if (cloudsEl) cloudsEl.className = `clouds-${fx.clouds}`;
+
+    // Fog
+    document.getElementById('fog-layer')?.classList.toggle('active', fx.fog);
+
+    // Precipitation
+    if (fx.rain)      setWeatherMode('rain');
+    else if (fx.snow) setWeatherMode('snow');
+    else              setWeatherMode('none');
+
+  } catch {
+    // silently fail — scene runs on time-data only
+  }
+}
+
+// ─── MAIN SCENE UPDATE (runs every 60s) ──────────────────────
+function updateScene() {
+  const { hours, minutes, total } = getLocalTime();
+  const colors = getPhaseColors(total);
+  const root   = document.documentElement;
+
+  // Sky gradient
+  root.style.setProperty('--sky-top',    colors.top);
+  root.style.setProperty('--sky-mid',    colors.mid);
+  root.style.setProperty('--sky-bot',    colors.bot);
+  root.style.setProperty('--hill-back',  colors.hillBack);
+  root.style.setProperty('--hill-front', colors.hillFront);
+
+  // Stars opacity
+  const starsEl = document.getElementById('stars-canvas') as HTMLCanvasElement | null;
+  if (starsEl) starsEl.style.opacity = String(colors.stars);
+
+  // Sun / Moon position
+  const info   = getCelestialInfo(total);
+  const sunEl  = document.getElementById('sun');
+  const moonEl = document.getElementById('moon');
+
+  if (sunEl && moonEl) {
+    const target  = info.type === 'sun' ? sunEl  : moonEl;
+    const hidden  = info.type === 'sun' ? moonEl : sunEl;
+
+    target.style.left    = `${info.x}%`;
+    target.style.top     = `${info.y}%`;
+    target.style.opacity = String(info.opacity);
+    hidden.style.opacity = '0';
+  }
+
+  // Time HUD
+  const hudTime = document.getElementById('hud-time');
+  if (hudTime) hudTime.textContent = `${padTwo(hours)}:${padTwo(minutes)}`;
+}
+
+// ─── RADIO PLAYER ─────────────────────────────────────────────
+function initPlayer() {
+  const audio     = document.getElementById('radio-audio') as HTMLAudioElement | null;
+  const playBtn   = document.getElementById('play-btn');
+  const volSlider = document.getElementById('volume-slider') as HTMLInputElement | null;
+  const iconPlay  = document.getElementById('icon-play');
+  const iconPause = document.getElementById('icon-pause');
+  const iconLoad  = document.getElementById('icon-loading');
+  const waveform  = document.getElementById('waveform');
+  const onAir     = document.getElementById('on-air-indicator');
+
+  if (!audio || !playBtn) return;
+
+  audio.volume = 0.8;
+
+  const showIcon = (state: 'play' | 'pause' | 'loading') => {
+    iconPlay?.classList.toggle('hidden',  state !== 'play');
+    iconPause?.classList.toggle('hidden', state !== 'pause');
+    iconLoad?.classList.toggle('hidden',  state !== 'loading');
+  };
+
+  playBtn.addEventListener('click', () => {
+    if (audio.paused) {
+      showIcon('loading');
+      audio.play().catch(() => showIcon('play'));
+    } else {
+      audio.pause();
+    }
+  });
+
+  audio.addEventListener('playing', () => {
+    showIcon('pause');
+    waveform?.classList.add('playing');
+    onAir?.classList.add('live');
+    playBtn.setAttribute('aria-label', 'Pausar radio');
+  });
+
+  audio.addEventListener('waiting', () => showIcon('loading'));
+
+  audio.addEventListener('pause', () => {
+    showIcon('play');
+    waveform?.classList.remove('playing');
+    onAir?.classList.remove('live');
+    playBtn.setAttribute('aria-label', 'Reproducir radio');
+  });
+
+  audio.addEventListener('error', () => {
+    showIcon('play');
+    waveform?.classList.remove('playing');
+    onAir?.classList.remove('live');
+  });
+
+  volSlider?.addEventListener('input', () => {
+    audio.volume = parseFloat(volSlider.value);
+  });
+}
+
+// ─── MODAL ────────────────────────────────────────────────────
+function initModal() {
+  const modal    = document.getElementById('about-modal');
+  const backdrop = document.getElementById('modal-backdrop');
+  const closeBtn = document.getElementById('modal-close');
+  const aboutBtn = document.getElementById('btn-about');
+
+  const openModal  = () => modal?.classList.add('open');
+  const closeModal = () => modal?.classList.remove('open');
+
+  aboutBtn?.addEventListener('click', openModal);
+  closeBtn?.addEventListener('click', closeModal);
+  backdrop?.addEventListener('click', closeModal);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+}
+
+// ─── RESIZE ───────────────────────────────────────────────────
+function onResize() {
+  drawStars();
+  const canvas = document.getElementById('weather-canvas') as HTMLCanvasElement | null;
+  if (canvas && activeMode !== 'none') {
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+    particles = makeParticles(activeMode, canvas.width, canvas.height);
+  }
+}
+
+// ─── BOOT ─────────────────────────────────────────────────────
+drawStars();
+updateScene();
+initPlayer();
+initModal();
+fetchWeather();
+
+setInterval(updateScene, 60_000);
+setInterval(fetchWeather, 30 * 60_000);
+
+let resizeTimer: ReturnType<typeof setTimeout>;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(onResize, 200);
+});
+</script>
+
+<style>
+  #weather-hud {
+    position: fixed;
+    left: 28px;
+    bottom: 84px;
+    z-index: 10;
+
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 0.75rem;
+    font-weight: 300;
+    letter-spacing: 0.04em;
+    pointer-events: none;
+    user-select: none;
+
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+  }
+
+  #hud-row-top {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.95rem;
+  }
+
+  #hud-icon {
+    font-size: 1rem;
+    line-height: 1;
+  }
+
+  #hud-temp {
+    font-size: 0.82rem;
+    opacity: 0.85;
+  }
+
+  #hud-time {
+    font-size: 1.15rem;
+    font-weight: 400;
+    letter-spacing: 0.12em;
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  #hud-city {
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    opacity: 0.45;
+  }
+</style>
