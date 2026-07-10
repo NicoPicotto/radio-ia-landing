@@ -12,13 +12,13 @@ import AboutModal from '../components/AboutModal.astro';
   <SideButtons />
   <AboutModal />
 
-  <!-- Weather & time HUD (bottom-left, above hills) -->
-  <div id="weather-hud" data-reveal="up">
-    <div id="hud-row-top">
-      <span id="hud-icon">·</span>
-      <span id="hud-temp"></span>
-    </div>
+  <!-- Weather & time HUD (top-center) -->
+  <div id="weather-hud" data-reveal="down">
+    <span id="hud-icon">·</span>
+    <span id="hud-temp"></span>
+    <span class="hud-sep">·</span>
     <span id="hud-time">--:--</span>
+    <span class="hud-sep">·</span>
     <span id="hud-city">General Deheza</span>
   </div>
 </Layout>
@@ -86,10 +86,10 @@ const PHASES: Phase[] = [
   { h: 4,  top: '#0a0820', mid: '#180c2e', bot: '#23103a', hillBack: '#0e0816', hillFront: '#070510', stars: 0.85 },
   { h: 5,  top: '#200e38', mid: '#8c2255', bot: '#d44422', hillBack: '#1a0810', hillFront: '#0e0608', stars: 0.45 },
   { h: 6,  top: '#e05030', mid: '#f0924a', bot: '#ffd060', hillBack: '#2a1012', hillFront: '#180a0a', stars: 0.05 },
-  { h: 7,  top: '#58b0d8', mid: '#7ecae8', bot: '#d0eaf5', hillBack: '#183018', hillFront: '#0e1e0e', stars: 0.0  },
-  { h: 10, top: '#1a8dd0', mid: '#36aee0', bot: '#96d8f0', hillBack: '#163020', hillFront: '#0c1c0e', stars: 0.0  },
-  { h: 13, top: '#1678c8', mid: '#2890d8', bot: '#7ac8e8', hillBack: '#142e1e', hillFront: '#0c1c0c', stars: 0.0  },
-  { h: 16, top: '#2272c0', mid: '#4a90d0', bot: '#cfa040', hillBack: '#182812', hillFront: '#101808', stars: 0.0  },
+  { h: 7,  top: '#58b0d8', mid: '#7ecae8', bot: '#d0eaf5', hillBack: '#3a5e2c', hillFront: '#263e1a', stars: 0.0  },
+  { h: 10, top: '#1a8dd0', mid: '#36aee0', bot: '#96d8f0', hillBack: '#4a7030', hillFront: '#30501e', stars: 0.0  },
+  { h: 13, top: '#1678c8', mid: '#2890d8', bot: '#7ac8e8', hillBack: '#507835', hillFront: '#345224', stars: 0.0  },
+  { h: 16, top: '#2272c0', mid: '#4a90d0', bot: '#cfa040', hillBack: '#587535', hillFront: '#3a5222', stars: 0.0  },
   { h: 18, top: '#c84020', mid: '#a0206c', bot: '#501888', hillBack: '#220a1a', hillFront: '#160812', stars: 0.0  },
   { h: 19, top: '#8020a0', mid: '#401888', bot: '#1e1060', hillBack: '#180a22', hillFront: '#10061a', stars: 0.2  },
   { h: 20, top: '#1a1038', mid: '#1c1448', bot: '#2a1865', hillBack: '#0e0a1e', hillFront: '#080616', stars: 0.55 },
@@ -344,10 +344,24 @@ async function fetchWeather() {
 }
 
 // ─── MAIN SCENE UPDATE (runs every 60s) ──────────────────────
-function updateScene() {
+// instant=true skips slow CSS transitions so the first paint
+// shows the correct time-of-day colors immediately.
+function updateScene(instant = false) {
   const { hours, minutes, total } = getLocalTime();
   const colors = getPhaseColors(total);
   const root   = document.documentElement;
+
+  const skyBg   = document.getElementById('sky-bg');
+  const hillsSvg = document.getElementById('hills');
+  const starsEl  = document.getElementById('stars-canvas') as HTMLCanvasElement | null;
+  const sunEl    = document.getElementById('sun');
+  const moonEl   = document.getElementById('moon');
+
+  if (instant) {
+    for (const el of [skyBg, hillsSvg, starsEl, sunEl, moonEl]) {
+      if (el) (el as HTMLElement).style.transition = 'none';
+    }
+  }
 
   // Sky gradient
   root.style.setProperty('--sky-top',    colors.top);
@@ -357,18 +371,13 @@ function updateScene() {
   root.style.setProperty('--hill-front', colors.hillFront);
 
   // Stars opacity
-  const starsEl = document.getElementById('stars-canvas') as HTMLCanvasElement | null;
   if (starsEl) starsEl.style.opacity = String(colors.stars);
 
   // Sun / Moon position
-  const info   = getCelestialInfo(total);
-  const sunEl  = document.getElementById('sun');
-  const moonEl = document.getElementById('moon');
-
+  const info = getCelestialInfo(total);
   if (sunEl && moonEl) {
-    const target  = info.type === 'sun' ? sunEl  : moonEl;
-    const hidden  = info.type === 'sun' ? moonEl : sunEl;
-
+    const target = info.type === 'sun' ? sunEl  : moonEl;
+    const hidden = info.type === 'sun' ? moonEl : sunEl;
     target.style.left    = `${info.x}%`;
     target.style.top     = `${info.y}%`;
     target.style.opacity = String(info.opacity);
@@ -378,6 +387,18 @@ function updateScene() {
   // Time HUD
   const hudTime = document.getElementById('hud-time');
   if (hudTime) hudTime.textContent = `${padTwo(hours)}:${padTwo(minutes)}`;
+
+  if (instant) {
+    // Two rAFs: first lets the browser process the "transition: none",
+    // second confirms the repaint with correct values before re-enabling.
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        for (const el of [skyBg, hillsSvg, starsEl, sunEl, moonEl]) {
+          if (el) (el as HTMLElement).style.transition = '';
+        }
+      });
+    });
+  }
 }
 
 // ─── RADIO PLAYER ─────────────────────────────────────────────
@@ -466,7 +487,7 @@ function onResize() {
 
 // ─── BOOT ─────────────────────────────────────────────────────
 drawStars();
-updateScene();
+updateScene(true); // instant=true: skip 90s transitions on first paint
 initPlayer();
 initModal();
 fetchWeather();
@@ -484,52 +505,57 @@ window.addEventListener('resize', () => {
 <style>
   #weather-hud {
     position: fixed;
-    left: 28px;
-    bottom: 84px;
+    top: 22px;
+    left: 50%;
+    transform: translateX(-50%);
     z-index: 10;
 
     display: flex;
-    flex-direction: column;
-    gap: 2px;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
 
-    color: rgba(255, 255, 255, 0.55);
-    font-size: 0.75rem;
+    padding: 7px 18px;
+    background: rgba(0, 0, 0, 0.18);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 999px;
+
+    color: rgba(255, 255, 255, 0.65);
+    font-size: 0.8rem;
     font-weight: 300;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
     pointer-events: none;
     user-select: none;
-
-    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
-  }
-
-  #hud-row-top {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 0.95rem;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
   }
 
   #hud-icon {
-    font-size: 1rem;
+    font-size: 0.95rem;
     line-height: 1;
   }
 
   #hud-temp {
-    font-size: 0.82rem;
-    opacity: 0.85;
+    opacity: 0.9;
+  }
+
+  .hud-sep {
+    opacity: 0.3;
   }
 
   #hud-time {
-    font-size: 1.15rem;
+    font-size: 0.88rem;
     font-weight: 400;
-    letter-spacing: 0.12em;
-    color: rgba(255, 255, 255, 0.7);
+    letter-spacing: 0.14em;
+    color: rgba(255, 255, 255, 0.85);
   }
 
   #hud-city {
-    font-size: 0.62rem;
+    font-size: 0.68rem;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    opacity: 0.45;
+    opacity: 0.5;
   }
 </style>
