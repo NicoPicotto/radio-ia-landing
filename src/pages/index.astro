@@ -3,13 +3,15 @@ import Layout from '../layouts/Layout.astro';
 import SkyScene from '../components/SkyScene.astro';
 import RadioPlayer from '../components/RadioPlayer.astro';
 import SideButtons from '../components/SideButtons.astro';
+import RadioModal from '../components/RadioModal.astro';
 import AboutModal from '../components/AboutModal.astro';
 ---
 
-<Layout title="Radio IA" description="Tu radio de inteligencia artificial, 24/7">
+<Layout title="Deheza Jazz AI" description="Tu radio de inteligencia artificial, 24/7">
   <SkyScene />
   <RadioPlayer />
   <SideButtons />
+  <RadioModal />
   <AboutModal />
 
   <!-- Weather & time HUD (top-center) -->
@@ -460,18 +462,32 @@ function initPlayer() {
 
 // ─── MODAL ────────────────────────────────────────────────────
 function initModal() {
-  const modal    = document.getElementById('about-modal');
-  const backdrop = document.getElementById('modal-backdrop');
-  const closeBtn = document.getElementById('modal-close');
-  const aboutBtn = document.getElementById('btn-about');
+  const radioModal    = document.getElementById('radio-modal');
+  const radioBackdrop = document.getElementById('radio-modal-backdrop');
+  const radioClose    = document.getElementById('radio-modal-close');
+  const radioBtn      = document.getElementById('btn-radio');
 
-  const openModal  = () => modal?.classList.add('open');
-  const closeModal = () => modal?.classList.remove('open');
+  const creatorModal    = document.getElementById('creator-modal');
+  const creatorBackdrop = document.getElementById('creator-modal-backdrop');
+  const creatorClose    = document.getElementById('creator-modal-close');
+  const creatorBtn      = document.getElementById('btn-creator');
 
-  aboutBtn?.addEventListener('click', openModal);
-  closeBtn?.addEventListener('click', closeModal);
-  backdrop?.addEventListener('click', closeModal);
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+  const openRadio    = () => radioModal?.classList.add('open');
+  const closeRadio   = () => radioModal?.classList.remove('open');
+  const openCreator  = () => creatorModal?.classList.add('open');
+  const closeCreator = () => creatorModal?.classList.remove('open');
+
+  radioBtn?.addEventListener('click', openRadio);
+  radioClose?.addEventListener('click', closeRadio);
+  radioBackdrop?.addEventListener('click', closeRadio);
+
+  creatorBtn?.addEventListener('click', openCreator);
+  creatorClose?.addEventListener('click', closeCreator);
+  creatorBackdrop?.addEventListener('click', closeCreator);
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { closeRadio(); closeCreator(); }
+  });
 }
 
 // ─── RESIZE ───────────────────────────────────────────────────

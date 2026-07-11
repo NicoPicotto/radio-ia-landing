@@ -1,92 +1,61 @@
-<!-- About the project modal -->
-<div id="about-modal" aria-modal="true" role="dialog" aria-labelledby="modal-title">
+<!-- Creator / project modal -->
+<div id="creator-modal" aria-modal="true" role="dialog" aria-labelledby="creator-modal-title">
 
-  <!-- Backdrop -->
-  <div id="modal-backdrop"></div>
+  <div id="creator-modal-backdrop"></div>
 
-  <!-- Card -->
-  <div id="modal-card">
+  <div id="creator-modal-card">
 
-    <!-- Close button -->
-    <button id="modal-close" aria-label="Cerrar">
+    <button id="creator-modal-close" aria-label="Cerrar">
       <svg viewBox="0 0 24 24" fill="none">
         <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
       </svg>
     </button>
 
-    <!-- Content -->
     <div class="modal-header">
-      <span class="modal-icon">📡</span>
-      <h2 id="modal-title">Sobre el proyecto</h2>
+      <span class="modal-icon">
+        <svg viewBox="0 0 24 24" fill="none" width="22" height="22">
+          <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.6"/>
+          <path d="M4 20c0-4 3.582-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+      </span>
+      <h2 id="creator-modal-title">El Proyecto</h2>
     </div>
 
     <div class="modal-body">
 
       <p class="modal-intro">
-        Una radio que funciona sola, las 24 horas, desde General Deheza, Córdoba.
-        Sin locutores reales, sin nadie operando la consola. Solo música y dos
-        vecinos imaginarios que la llevan adelante.
+        Un proyecto personal, sin fines comerciales, hecho por el placer de
+        construir algo raro. Una radio autónoma que no necesita a nadie para
+        seguir al aire.
       </p>
 
       <div class="modal-divider"></div>
 
-      <!-- Locutores -->
-      <div class="locutores-label">Los locutores</div>
-
-      <div class="locutor-card">
-        <span class="locutor-name">Dora</span>
-        <span class="locutor-desc">
-          Señora de pueblo, chusma y con opinión sobre todo. Conduce el
-          programa. No sabe que es una IA.
-        </span>
-      </div>
-      <div class="locutor-card">
-        <span class="locutor-name">Cacho</span>
-        <span class="locutor-desc">
-          El marido de Dora. Igual de chismoso, pero no puede resistirse a
-          tirar un chiste malo. Dora lo sufre, pero se ríe igual.
-        </span>
-      </div>
-
-      <div class="modal-divider"></div>
-
-      <!-- Features -->
-      <div class="features-grid">
-        <div class="feature-pill">
-          <span class="feature-icon">🕐</span>
-          <span>Hora y clima en tiempo real</span>
-        </div>
-        <div class="feature-pill">
-          <span class="feature-icon">📰</span>
-          <span>Noticias de Córdoba</span>
-        </div>
-        <div class="feature-pill">
-          <span class="feature-icon">🎵</span>
-          <span>Hablan cada 3 canciones</span>
-        </div>
+      <div class="creator-row">
+        <span class="creator-name">Nico Picotto</span>
+        <a
+          href="https://nicopicotto.dev"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="project-link"
+        >
+          <svg viewBox="0 0 24 24" fill="none" width="13" height="13">
+            <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/>
+            <path d="M2 12h20M12 3c-2.5 3-4 5.5-4 9s1.5 6 4 9M12 3c2.5 3 4 5.5 4 9s-1.5 6-4 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+          nicopicotto.dev
+        </a>
       </div>
 
     </div>
 
-    <!-- Footer -->
-    <div class="modal-footer">
-      <span class="footer-credit">Una creación de Nico Picotto</span>
-      <a
-        href="https://github.com/NicoPicotto/radio-ai"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="github-link"
-        aria-label="Ver código en GitHub"
-      >
-        <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14">
-          <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.745 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
-        </svg>
-        Ver en GitHub
-      </a>
-    </div>
-
-    <!-- Donate link -->
-    <a href="https://link.mercadopago.com.ar/radioai" target="_blank" rel="noopener noreferrer" class="donate-link" aria-label="Apoyar el proyecto">
+    <a
+      href="https://link.mercadopago.com.ar/radioai"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="donate-link"
+      aria-label="Apoyar el proyecto"
+    >
       <svg viewBox="0 0 24 24" fill="none" width="16" height="16">
         <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="currentColor"/>
       </svg>
@@ -97,7 +66,7 @@
 </div>
 
 <style>
-  #about-modal {
+  #creator-modal {
     display: none;
     position: fixed;
     inset: 0;
@@ -106,12 +75,11 @@
     justify-content: center;
   }
 
-  #about-modal.open {
+  #creator-modal.open {
     display: flex;
   }
 
-  /* === BACKDROP === */
-  #modal-backdrop {
+  #creator-modal-backdrop {
     position: absolute;
     inset: 0;
     background: rgba(0, 0, 0, 0.55);
@@ -120,13 +88,11 @@
     animation: fade-in 0.25s ease;
   }
 
-  /* === CARD === */
-  #modal-card {
+  #creator-modal-card {
     position: relative;
     z-index: 1;
     width: 92%;
     max-width: 420px;
-
     padding: 2rem;
     background: rgba(8, 12, 28, 0.88);
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -134,7 +100,6 @@
     box-shadow:
       0 24px 60px rgba(0, 0, 0, 0.5),
       0 1px 0 rgba(255, 255, 255, 0.08) inset;
-
     color: rgba(255, 255, 255, 0.85);
     animation: slide-up 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
@@ -149,8 +114,7 @@
     to   { opacity: 1; transform: translateY(0) scale(1); }
   }
 
-  /* === CLOSE BUTTON === */
-  #modal-close {
+  #creator-modal-close {
     position: absolute;
     top: 1rem;
     right: 1rem;
@@ -167,17 +131,16 @@
     cursor: pointer;
   }
 
-  #modal-close:hover {
+  #creator-modal-close:hover {
     color: rgba(255, 255, 255, 0.9);
     background: rgba(255, 255, 255, 0.12);
   }
 
-  #modal-close svg {
+  #creator-modal-close svg {
     width: 15px;
     height: 15px;
   }
 
-  /* === HEADER === */
   .modal-header {
     display: flex;
     align-items: center;
@@ -186,22 +149,23 @@
   }
 
   .modal-icon {
-    font-size: 1.4rem;
+    color: rgba(255, 255, 255, 0.65);
+    display: flex;
+    align-items: center;
   }
 
-  #modal-title {
+  #creator-modal-title {
     font-size: 1.1rem;
     font-weight: 400;
     letter-spacing: 0.06em;
     color: rgba(255, 255, 255, 0.9);
   }
 
-  /* === BODY === */
   .modal-body {
     display: flex;
     flex-direction: column;
     gap: 0.85rem;
-    margin-bottom: 1.25rem;
+    margin-bottom: 1.5rem;
   }
 
   .modal-intro {
@@ -216,89 +180,35 @@
     background: rgba(255, 255, 255, 0.08);
   }
 
-  /* === LOCUTORES === */
-  .locutores-label {
-    font-size: 0.65rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.3);
-    margin-bottom: -0.25rem;
-  }
-
-  .locutor-card {
-    display: flex;
-    flex-direction: column;
-    gap: 0.15rem;
-  }
-
-  .locutor-name {
-    font-size: 0.85rem;
-    font-weight: 400;
-    color: rgba(255, 255, 255, 0.7);
-    letter-spacing: 0.02em;
-  }
-
-  .locutor-desc {
-    font-size: 0.85rem;
-    font-weight: 300;
-    line-height: 1.7;
-    color: rgba(255, 255, 255, 0.6);
-  }
-
-  /* === FEATURES === */
-  .features-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-  }
-
-  .feature-pill {
-    display: flex;
-    align-items: center;
-    gap: 0.55rem;
-    font-size: 0.85rem;
-    color: rgba(255, 255, 255, 0.6);
-    font-weight: 300;
-    line-height: 1.7;
-  }
-
-  .feature-icon {
-    font-size: 0.85rem;
-    flex-shrink: 0;
-  }
-
-  /* === FOOTER === */
-  .modal-footer {
+  .creator-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 1.5rem;
   }
 
-  .footer-credit {
-    font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.35);
-    letter-spacing: 0.02em;
+  .creator-name {
+    font-size: 0.85rem;
     font-weight: 300;
+    color: rgba(255, 255, 255, 0.6);
+    letter-spacing: 0.02em;
   }
 
-  .github-link {
+  .project-link {
     display: flex;
     align-items: center;
-    gap: 0.35rem;
-    font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.85);
+    gap: 0.6rem;
+    font-size: 0.85rem;
+    font-weight: 300;
+    color: rgba(255, 255, 255, 0.75);
     text-decoration: none;
     transition: color 0.2s;
     letter-spacing: 0.02em;
-    font-weight: 300;
   }
 
-  .github-link:hover {
+  .project-link:hover {
     color: rgba(255, 255, 255, 1);
   }
 
-  /* === DONATE LINK === */
   .donate-link {
     display: flex;
     align-items: center;
