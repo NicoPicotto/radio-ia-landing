@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="70%" r="65%">
+      <stop offset="0%" stop-color="#2d1b69"/>
+      <stop offset="100%" stop-color="#030612"/>
+    </radialGradient>
+    <filter id="glow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="0.9" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background rounded square -->
+  <rect width="32" height="32" rx="7" fill="url(#bg)"/>
+
+  <!-- Stars -->
+  <circle cx="25" cy="6"  r="1"   fill="#ffffff" opacity="0.75"/>
+  <circle cx="8"  cy="9"  r="0.6" fill="#ffffff" opacity="0.5"/>
+  <circle cx="20" cy="4"  r="0.5" fill="#c4b5fd" opacity="0.65"/>
+  <circle cx="4"  cy="14" r="0.5" fill="#ffffff" opacity="0.4"/>
+
+  <!-- Broadcast arcs (center 16, 24) — sweep=0 goes counterclockwise → upward -->
+  <!-- Outer arc, radius 12 -->
+  <path d="M 4 24 A 12 12 0 0 0 28 24"
+        fill="none" stroke="#6366f1" stroke-width="1.2" stroke-linecap="round" opacity="0.4"/>
+  <!-- Mid arc, radius 8 -->
+  <path d="M 8 24 A 8 8 0 0 0 24 24"
+        fill="none" stroke="#818cf8" stroke-width="1.6" stroke-linecap="round" opacity="0.65"/>
+  <!-- Inner arc, radius 4 -->
+  <path d="M 12 24 A 4 4 0 0 0 20 24"
+        fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" opacity="0.88"/>
+
+  <!-- Transmitter dot -->
+  <circle cx="16" cy="24" r="2" fill="#c4b5fd" filter="url(#glow)"/>
+</svg>

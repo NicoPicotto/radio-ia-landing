@@ -16,8 +16,8 @@ import AboutModal from '../components/AboutModal.astro';
 
   <!-- Weather & time HUD (top-center) -->
   <div id="weather-hud" data-reveal="down">
-    <span id="hud-icon">·</span>
-    <span id="hud-temp"></span>
+    <span id="hud-icon" style="display:none">·</span>
+    <span id="hud-temp" style="display:none"></span>
     <span class="hud-sep">·</span>
     <span id="hud-time">--:--</span>
     <span class="hud-sep">·</span>
@@ -268,80 +268,58 @@ function setWeatherMode(mode: WeatherMode) {
   activeMode = mode;
 }
 
-// ─── WEATHER FETCH (wttr.in, no API key) ─────────────────────
-const W_MAP: Record<number, { icon: string; clouds: 0|1|2|3; rain: boolean; snow: boolean; fog: boolean }> = {
-  113: { icon: '☀',  clouds: 0, rain: false, snow: false, fog: false },
-  116: { icon: '⛅', clouds: 1, rain: false, snow: false, fog: false },
-  119: { icon: '☁',  clouds: 2, rain: false, snow: false, fog: false },
-  122: { icon: '☁',  clouds: 3, rain: false, snow: false, fog: false },
-  143: { icon: '🌫', clouds: 2, rain: false, snow: false, fog: true  },
-  176: { icon: '🌦', clouds: 2, rain: true,  snow: false, fog: false },
-  179: { icon: '🌨', clouds: 2, rain: false, snow: true,  fog: false },
-  200: { icon: '⛈', clouds: 3, rain: true,  snow: false, fog: false },
-  227: { icon: '❄',  clouds: 2, rain: false, snow: true,  fog: false },
-  230: { icon: '❄',  clouds: 3, rain: false, snow: true,  fog: false },
-  248: { icon: '🌫', clouds: 2, rain: false, snow: false, fog: true  },
-  260: { icon: '🌫', clouds: 2, rain: false, snow: false, fog: true  },
-  263: { icon: '🌧', clouds: 2, rain: true,  snow: false, fog: false },
-  266: { icon: '🌧', clouds: 2, rain: true,  snow: false, fog: false },
-  293: { icon: '🌧', clouds: 2, rain: true,  snow: false, fog: false },
-  296: { icon: '🌧', clouds: 2, rain: true,  snow: false, fog: false },
-  299: { icon: '🌧', clouds: 3, rain: true,  snow: false, fog: false },
-  302: { icon: '🌧', clouds: 3, rain: true,  snow: false, fog: false },
-  305: { icon: '🌧', clouds: 3, rain: true,  snow: false, fog: false },
-  308: { icon: '🌧', clouds: 3, rain: true,  snow: false, fog: false },
-  317: { icon: '🌨', clouds: 2, rain: false, snow: true,  fog: false },
-  320: { icon: '🌨', clouds: 2, rain: false, snow: true,  fog: false },
-  323: { icon: '🌨', clouds: 2, rain: false, snow: true,  fog: false },
-  326: { icon: '🌨', clouds: 2, rain: false, snow: true,  fog: false },
-  329: { icon: '❄',  clouds: 3, rain: false, snow: true,  fog: false },
-  332: { icon: '❄',  clouds: 3, rain: false, snow: true,  fog: false },
-  335: { icon: '❄',  clouds: 3, rain: false, snow: true,  fog: false },
-  338: { icon: '❄',  clouds: 3, rain: false, snow: true,  fog: false },
-  353: { icon: '🌦', clouds: 1, rain: true,  snow: false, fog: false },
-  356: { icon: '🌧', clouds: 2, rain: true,  snow: false, fog: false },
-  359: { icon: '🌧', clouds: 3, rain: true,  snow: false, fog: false },
-  362: { icon: '🌨', clouds: 2, rain: false, snow: true,  fog: false },
-  365: { icon: '🌨', clouds: 2, rain: false, snow: true,  fog: false },
-  368: { icon: '🌨', clouds: 1, rain: false, snow: true,  fog: false },
-  371: { icon: '❄',  clouds: 3, rain: false, snow: true,  fog: false },
-  386: { icon: '⛈', clouds: 3, rain: true,  snow: false, fog: false },
-  389: { icon: '⛈', clouds: 3, rain: true,  snow: false, fog: false },
-  392: { icon: '⛈', clouds: 3, rain: false, snow: true,  fog: false },
-  395: { icon: '⛈', clouds: 3, rain: false, snow: true,  fog: false },
-};
+// ─── WEATHER FETCH (Open-Meteo, WMO codes) ───────────────────
+type WeatherFx = { icon: string; clouds: 0|1|2|3; rain: boolean; snow: boolean; fog: boolean };
+
+function wmoToFx(code: number): WeatherFx {
+  if (code === 0)                  return { icon: '☀',  clouds: 0, rain: false, snow: false, fog: false };
+  if (code === 1)                  return { icon: '🌤', clouds: 1, rain: false, snow: false, fog: false };
+  if (code === 2)                  return { icon: '⛅', clouds: 2, rain: false, snow: false, fog: false };
+  if (code === 3)                  return { icon: '☁',  clouds: 3, rain: false, snow: false, fog: false };
+  if (code === 45 || code === 48)  return { icon: '🌫', clouds: 2, rain: false, snow: false, fog: true  };
+  if (code >= 51 && code <= 55)    return { icon: '🌦', clouds: 2, rain: true,  snow: false, fog: false };
+  if (code >= 61 && code <= 65)    return { icon: '🌧', clouds: 3, rain: true,  snow: false, fog: false };
+  if (code >= 71 && code <= 75)    return { icon: '❄',  clouds: 3, rain: false, snow: true,  fog: false };
+  if (code === 77)                 return { icon: '🌨', clouds: 2, rain: false, snow: true,  fog: false };
+  if (code >= 80 && code <= 82)    return { icon: '🌧', clouds: 2, rain: true,  snow: false, fog: false };
+  if (code === 85 || code === 86)  return { icon: '🌨', clouds: 2, rain: false, snow: true,  fog: false };
+  if (code >= 95 && code <= 99)    return { icon: '⛈', clouds: 3, rain: true,  snow: false, fog: false };
+  return { icon: '☁', clouds: 2, rain: false, snow: false, fog: false };
+}
 
 async function fetchWeather() {
+  const hudIcon = document.getElementById('hud-icon');
+  const hudTemp = document.getElementById('hud-temp');
+
   try {
-    const res  = await fetch('https://wttr.in/General+Deheza?format=j1');
-    if (!res.ok) return;
+    const res = await fetch(
+      'https://api.open-meteo.com/v1/forecast?latitude=-32.75&longitude=-63.76&current=temperature_2m,weather_code&timezone=auto'
+    );
+    if (!res.ok) {
+      if (hudIcon) hudIcon.style.display = 'none';
+      if (hudTemp) hudTemp.style.display = 'none';
+      return;
+    }
     const data = await res.json();
-    const cond = data.current_condition[0];
-    const code = parseInt(cond.weatherCode, 10);
-    const temp = cond.temp_C;
+    const code = data.current.weather_code as number;
+    const temp = Math.round(data.current.temperature_2m as number);
+    const fx   = wmoToFx(code);
 
-    const fx = W_MAP[code] ?? { icon: '☀', clouds: 0, rain: false, snow: false, fog: false };
+    if (hudIcon) { hudIcon.textContent = fx.icon; hudIcon.style.display = ''; }
+    if (hudTemp) { hudTemp.textContent = `${temp}°`; hudTemp.style.display = ''; }
 
-    // Update HUD
-    const hudIcon = document.getElementById('hud-icon');
-    const hudTemp = document.getElementById('hud-temp');
-    if (hudIcon) hudIcon.textContent = fx.icon;
-    if (hudTemp) hudTemp.textContent  = `${temp}°`;
-
-    // Clouds
     const cloudsEl = document.getElementById('clouds-layer');
     if (cloudsEl) cloudsEl.className = `clouds-${fx.clouds}`;
 
-    // Fog
     document.getElementById('fog-layer')?.classList.toggle('active', fx.fog);
 
-    // Precipitation
     if (fx.rain)      setWeatherMode('rain');
     else if (fx.snow) setWeatherMode('snow');
     else              setWeatherMode('none');
 
   } catch {
-    // silently fail — scene runs on time-data only
+    if (hudIcon) hudIcon.style.display = 'none';
+    if (hudTemp) hudTemp.style.display = 'none';
   }
 }
 

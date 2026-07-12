@@ -1,0 +1,157 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="sky" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"   stop-color="#030612"/>
+      <stop offset="55%"  stop-color="#0a0f22"/>
+      <stop offset="100%" stop-color="#0f1530"/>
+    </linearGradient>
+    <radialGradient id="moonGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#fef9e7" stop-opacity="0.85"/>
+      <stop offset="35%"  stop-color="#fde68a" stop-opacity="0.25"/>
+      <stop offset="70%"  stop-color="#fde68a" stop-opacity="0.06"/>
+      <stop offset="100%" stop-color="#fde68a" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="waveGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="dotGlow" x="-150%" y="-150%" width="400%" height="400%">
+      <feGaussianBlur stdDeviation="10" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="textGlow" x="-5%" y="-15%" width="110%" height="130%">
+      <feGaussianBlur stdDeviation="10" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <linearGradient id="hillBack" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"   stop-color="#0d1a0d"/>
+      <stop offset="100%" stop-color="#040608"/>
+    </linearGradient>
+    <linearGradient id="hillFront" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"   stop-color="#060c06"/>
+      <stop offset="100%" stop-color="#020306"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Sky background -->
+  <rect width="1200" height="630" fill="url(#sky)"/>
+
+  <!-- Stars — row 1 (y 20–80) -->
+  <circle cx="45"  cy="35" r="1.5" fill="#ffffff" opacity="0.80"/>
+  <circle cx="120" cy="72" r="1.0" fill="#ffffff" opacity="0.60"/>
+  <circle cx="245" cy="25" r="2.0" fill="#ffffff" opacity="0.90"/>
+  <circle cx="380" cy="58" r="1.0" fill="#e2e8f0" opacity="0.50"/>
+  <circle cx="490" cy="30" r="1.5" fill="#ffffff" opacity="0.70"/>
+  <circle cx="670" cy="22" r="2.0" fill="#ffffff" opacity="0.85"/>
+  <circle cx="750" cy="64" r="1.0" fill="#e2e8f0" opacity="0.50"/>
+  <circle cx="850" cy="42" r="1.5" fill="#ffffff" opacity="0.75"/>
+  <circle cx="1045" cy="38" r="1.0" fill="#e2e8f0" opacity="0.50"/>
+  <circle cx="1122" cy="55" r="1.5" fill="#ffffff" opacity="0.70"/>
+  <circle cx="1182" cy="28" r="1.0" fill="#e2e8f0" opacity="0.65"/>
+
+  <!-- Stars — row 2 (y 100–160) -->
+  <circle cx="70"   cy="118" r="1.0" fill="#e2e8f0" opacity="0.40"/>
+  <circle cx="178"  cy="132" r="1.5" fill="#ffffff" opacity="0.65"/>
+  <circle cx="292"  cy="107" r="1.0" fill="#e2e8f0" opacity="0.55"/>
+  <circle cx="418"  cy="142" r="2.0" fill="#c4b5fd" opacity="0.60"/>
+  <circle cx="532"  cy="112" r="1.0" fill="#e2e8f0" opacity="0.50"/>
+  <circle cx="722"  cy="122" r="1.5" fill="#ffffff" opacity="0.80"/>
+  <circle cx="842"  cy="138" r="1.0" fill="#e2e8f0" opacity="0.45"/>
+  <circle cx="1082" cy="128" r="1.5" fill="#ffffff" opacity="0.70"/>
+
+  <!-- Stars — row 3 (y 175–240) -->
+  <circle cx="32"   cy="198" r="1.5" fill="#e2e8f0" opacity="0.55"/>
+  <circle cx="158"  cy="214" r="1.0" fill="#e2e8f0" opacity="0.40"/>
+  <circle cx="312"  cy="192" r="1.0" fill="#ffffff" opacity="0.65"/>
+  <circle cx="462"  cy="222" r="1.5" fill="#e2e8f0" opacity="0.50"/>
+  <circle cx="695"  cy="188" r="2.0" fill="#c4b5fd" opacity="0.55"/>
+  <circle cx="782"  cy="218" r="1.0" fill="#e2e8f0" opacity="0.45"/>
+  <circle cx="908"  cy="202" r="1.5" fill="#ffffff" opacity="0.55"/>
+  <circle cx="1012" cy="193" r="1.0" fill="#e2e8f0" opacity="0.50"/>
+  <circle cx="1142" cy="212" r="1.0" fill="#ffffff" opacity="0.65"/>
+
+  <!-- Stars — row 4 (y 250–310, sparse) -->
+  <circle cx="88"   cy="272" r="1.0" fill="#e2e8f0" opacity="0.35"/>
+  <circle cx="202"  cy="262" r="1.5" fill="#e2e8f0" opacity="0.40"/>
+  <circle cx="352"  cy="282" r="1.0" fill="#ffffff" opacity="0.38"/>
+  <circle cx="502"  cy="268" r="1.0" fill="#e2e8f0" opacity="0.38"/>
+  <circle cx="802"  cy="258" r="1.0" fill="#e2e8f0" opacity="0.32"/>
+  <circle cx="1102" cy="268" r="1.5" fill="#e2e8f0" opacity="0.38"/>
+
+  <!-- Moon glow (top-right, night scene) -->
+  <circle cx="952" cy="102" r="88"  fill="url(#moonGlow)"/>
+  <circle cx="952" cy="102" r="32"  fill="#fef9e7" opacity="0.82"/>
+
+  <!-- Subtle jazz music notes in background -->
+  <text x="112" y="178" font-size="30" fill="#a78bfa" opacity="0.10" font-family="serif">♪</text>
+  <text x="172" y="335" font-size="38" fill="#6366f1" opacity="0.09" font-family="serif">♫</text>
+  <text x="992" y="338" font-size="30" fill="#a78bfa" opacity="0.09" font-family="serif">♪</text>
+  <text x="1062" cy="228" font-size="24" fill="#818cf8" opacity="0.09" font-family="serif">♩</text>
+  <text x="78"  y="425" font-size="22" fill="#818cf8" opacity="0.07" font-family="serif">♩</text>
+  <text x="1092" y="415" font-size="26" fill="#6366f1" opacity="0.08" font-family="serif">♫</text>
+
+  <!-- ── Broadcast waves (center 600, 270) — sweep=0 → counterclockwise → upward ── -->
+  <g filter="url(#waveGlow)">
+    <!-- Outermost (radius 120) -->
+    <path d="M 480 270 A 120 120 0 0 0 720 270"
+          fill="none" stroke="#6366f1" stroke-width="2"   stroke-linecap="round" opacity="0.28"/>
+    <!-- Radius 95 -->
+    <path d="M 505 270 A 95 95 0 0 0 695 270"
+          fill="none" stroke="#818cf8" stroke-width="2.5" stroke-linecap="round" opacity="0.44"/>
+    <!-- Radius 68 -->
+    <path d="M 532 270 A 68 68 0 0 0 668 270"
+          fill="none" stroke="#a78bfa" stroke-width="3"   stroke-linecap="round" opacity="0.62"/>
+    <!-- Radius 43 -->
+    <path d="M 557 270 A 43 43 0 0 0 643 270"
+          fill="none" stroke="#c4b5fd" stroke-width="3.5" stroke-linecap="round" opacity="0.78"/>
+    <!-- Innermost (radius 20) -->
+    <path d="M 580 270 A 20 20 0 0 0 620 270"
+          fill="none" stroke="#ddd6fe" stroke-width="4"   stroke-linecap="round" opacity="0.92"/>
+  </g>
+
+  <!-- Transmitter dot -->
+  <circle cx="600" cy="270" r="9" fill="#ddd6fe" filter="url(#dotGlow)"/>
+  <circle cx="600" cy="270" r="5" fill="#ffffff"/>
+
+  <!-- Main title "RADIO IA" — "IA" in violet -->
+  <text
+    x="600" y="400"
+    text-anchor="middle"
+    font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif"
+    font-size="90"
+    font-weight="700"
+    letter-spacing="10"
+    filter="url(#textGlow)">
+    <tspan fill="#ffffff">DEHEZA JAZZ </tspan><tspan fill="#c4b5fd">IA</tspan>
+  </text>
+
+  <!-- Tagline -->
+  <text
+    x="600" y="455"
+    text-anchor="middle"
+    font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif"
+    font-size="25"
+    font-weight="300"
+    letter-spacing="1.5"
+    fill="#94a3b8">Tu radio de inteligencia artificial, 24/7</text>
+
+  <!-- Thin accent divider -->
+  <line x1="510" y1="476" x2="690" y2="476" stroke="#4c1d95" stroke-width="1" opacity="0.45"/>
+
+  <!-- Back hills (pampa silhouette) -->
+  <path d="M 0 555
+           C 80 530, 180 540, 280 525
+           C 380 510, 480 500, 590 505
+           C 700 510, 800 525, 920 510
+           C 1040 495, 1120 490, 1200 498
+           L 1200 630 L 0 630 Z"
+        fill="url(#hillBack)"/>
+
+  <!-- Front hills -->
+  <path d="M 0 592
+           C 120 580, 260 588, 400 578
+           C 540 568, 680 575, 820 568
+           C 960 561, 1080 572, 1200 568
+           L 1200 630 L 0 630 Z"
+        fill="url(#hillFront)"/>
+</svg>
